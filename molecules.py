@@ -4,6 +4,7 @@ from .thermal_contribs import vibrationalSE, translationalSE
 from .constants import *
 import periodictable as pt
 import re
+#comment
 
 dist = lambda a,b:np.linalg.norm(a-b)
 

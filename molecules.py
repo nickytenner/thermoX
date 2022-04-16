@@ -1,10 +1,9 @@
 import sys
 import numpy as np
-from .thermal_contribs import vibrationalSE, translationalSE
+from .thermal_contribs import vibrationalSE, translationalSE, rotationalSE
 from .constants import *
 import periodictable as pt
 import re
-#comment
 
 dist = lambda a,b:np.linalg.norm(a-b)
 
@@ -34,11 +33,13 @@ class Compound(object):
             else:
                 vbuf = vbuf+line
             if search_strings[4] in line:
-                self.SPE = float(line.split()[-1]) 
+                self.SPE = float(line.split()[-1])*627.50960803059
             if search_strings[5] in line:
                 self.sigma = int(line.split()[-1])
             if search_strings[6] in line:
                 self.linear = True
+            if search_strings[7] in line:
+                self.G298 = float(line.split()[-2])*627.50960803059
         assert self.sigma is not None
         coord = coord.split('\n')[1:-3]
         self.xyz = {}
@@ -60,6 +61,9 @@ class Compound(object):
         self.getMolarMass()
         self.getMomOfInertia()
         self.getThetav()
+        self.getSEvib()
+        self.getSEtrans()
+        self.getSErot()
     def getThetav(self):
         self.thetav=H*C*np.array(list(self.freq.values()))/KB
     def getMolarMass(self):
@@ -94,7 +98,7 @@ class Compound(object):
     def getSEtrans (self,*args,**kwargs):
         kw = {}
         kw.update(kwargs)
-        P = kw.get('P',1.0)
+        P = kw.get('P',101325)
         T = kw.get('T',298.15)
         Trange = kw.get('Trange',None)
         self.strans,self.etrans = translationalSE(P=P,Trange=Trange,M=self.M)
@@ -104,6 +108,34 @@ class Compound(object):
         T = kw.get('T',298.15)
         Trange = kw.get('Trange',None)
         self.svib,self.evib= vibrationalSE(Trange=Trange,freq=list(self.freq.values()))
+    def getSErot (self,*args,**kwargs):
+        kw = {}
+        kw.update(kwargs)
+        T = kw.get('T',298.15)
+        Trange = kw.get ('Trange',None)
+        self.srot,self.erot = rotationalSE (Trange=Trange,sig=self.sigma,\
+                             lin=self.linear,thetar=self.thetar,thetaA=self.thetaA,\
+                             thetaB=self.thetaB,thetaC=self.thetaC)
+    def getG (self,*args,**kwargs):
+        kw = {}
+        kw.update(kwargs)
+        T = kw.get('T',298.15)
+        Trange = kw.get('Trange',None)
+        x = kw.get ('x',1.0)
+        P = kw.get ('P',101325)
+        Px = P*x #Partial pressure
+        self.getSEtrans(P=Px,T=T,Trange=Trange)
+        self.getSEvib(T=T,Trange=Trange)
+        self.getSErot(T=T,Trange=Trange)
+        self.U = self.etrans+self.erot+self.evib+self.SPE
+        self.S = self.strans+self.srot+self.svib
+        if Trange is None:
+            Trange = np.array(T)
+        else:
+            Trange = np.array(Trange)
+        self.PV = R*Trange
+        self.G = x*(self.U + self.PV - Trange*self.S)
+        #return (self.G)
         
             
           

@@ -12,4 +12,5 @@ search_strings = ["CARTESIAN COORDINATES (ANGSTROEM)",
                   "NORMAL MODES",
                   "FINAL SINGLE POINT ENERGY",
                   "Point Group:",
-                  "The molecule is recognized as being linear"]
+                  "The molecule is recognized as being linear",
+                  "Final Gibbs free energy"]

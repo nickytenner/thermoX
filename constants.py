@@ -6,6 +6,7 @@ H  = cs.h              # kgm^2/s
 AMU = 1.660538921e-27  # Atomic mass unit kg
 BOHR = 5.292e-11       # Bohr radius m
 C  = cs.c * 100        # speed of light in cm/s
+HARTREE2KCALPMOL = 627.50960803059
 search_strings = ["CARTESIAN COORDINATES (ANGSTROEM)",
                   "CARTESIAN COORDINATES (A.U.)",
                   "VIBRATIONAL FREQUENCIES",

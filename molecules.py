@@ -55,7 +55,7 @@ class Compound(object):
             elif freq > 0.0:
                 self.freq.update({i:freq})
             else:
-                print("ERROR: Found negative frequency ({}) in {}\nTERMINATING".\
+                print("ERROR: Found negative eigen value ({}) in {}\nTERMINATING".\
                       format(freq,self.fname))
                 sys.exit()
         self.getMolarMass()
